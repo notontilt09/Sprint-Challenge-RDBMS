@@ -8,7 +8,8 @@ module.exports = {
     getProjectById,
     getProjects,
     getActionById,
-    getActions
+    getActions,
+    removeProject
 }
 
 function addProject(project) {
@@ -42,4 +43,10 @@ function getActionById(id) {
     return db('actions')
         .where({ id: id })
         .first();
+}
+
+function removeProject(id) {
+    return db('projects')
+        .where({ id: id })
+        .del();
 }

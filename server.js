@@ -10,6 +10,9 @@ server.use(express.json());
 server.get('/api/projects', async (req, res) => {
     try {
         const projects = await db.getProjects()
+        projects.map(project => {
+            project.completed = project.completed === 0 || null ? false : true;
+        })
         res.status(200).json(projects);
     } catch (error) {
         res.status(500).json(error);
@@ -24,7 +27,7 @@ server.get('/api/projects/:id', async (req, res) => {
         } else {
             const actions = await db.getActions()
                 .where({ project_id: req.params.id })
-            actions.forEach(action => {
+            actions.map(action => {
                 action.completed = action.completed === 0 ? false : true;
             })
             project.actions = actions;
@@ -42,17 +45,27 @@ server.post('/api/projects', async (req, res) => {
         if (!req.body.name || !req.body.description) {
             res.status(404).json({ message: 'Please provide a name and description for the project' });
         } else {
-            const newProject = await db.getProject(id);
+            const newProject = await db.getProjectById(id);
+
             res.status(201).json(newProject)
         }
     } catch (error) {
-        res.status(500).json(error);        
+        res.status(500).json({ message: 'Please provide a name and description for the project' });        
     }
 });
 
-// server.delete('/api/projects/:id', async (req, res) => {
-    
-// });
+server.delete('/api/projects/:id', async (req, res) => {
+    try {
+        const count = await db.removeProject(req.params.id);
+        if (!count) {
+            res.status(404).json({ message: `There is no project with id of ${req.params.id}` });
+        } else {
+            res.status(204).end();
+        }
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
 
 server.get('/api/actions', async (req, res) => {
     try {
