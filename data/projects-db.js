@@ -5,17 +5,41 @@ const db = knex(knexConfig.development);
 module.exports = {
     addProject,
     addAction,
-    getProject
+    getProjectById,
+    getProjects,
+    getActionById,
+    getActions
 }
 
 function addProject(project) {
-
+    return db('projects')
+        .insert(project)
+        .then(ids => ({ id: ids[0] }))
 }
 
 function addAction(action) {
+    return db('actions')
+        .insert(action)
+        .then(ids => ({ id: ids[0] }))
 
 }
 
-function getProject(id) {
-    
+function getProjectById(id) {
+    return db('projects')
+        .where({ id: id })
+        .first();
+}
+
+function getProjects() {
+    return db('projects');
+}
+
+function getActions() {
+    return db('actions');
+}
+
+function getActionById(id) {
+    return db('actions')
+        .where({ id: id })
+        .first();
 }
